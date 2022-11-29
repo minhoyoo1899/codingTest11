@@ -1,1 +1,0 @@
-<ul><li>메뉴</li></ul>  <footer>kdt 클래스</footer>

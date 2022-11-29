@@ -1,1 +1,0 @@
-<footer>kdt 클래스</footer>

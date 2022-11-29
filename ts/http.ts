@@ -122,12 +122,13 @@ function openServer(index: string, a: string, b: string, c: string, d: string) {
   const server = http.createServer((req: any, res: any) => {
     let url = req.url;
     if (req.method === "GET") {
-      switch (url) {
-        case '/':
+      switch (url) {     
+        default:
           res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
           res.write(index);
           res.end();
           break;
+        
         case '/a':
           res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
           res.write(a);
@@ -147,12 +148,7 @@ function openServer(index: string, a: string, b: string, c: string, d: string) {
           res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
           res.write(d);
           res.end();
-          break;
-        // default:
-        //   res.writeHead(405, { 'Content-Type': 'text/html; charset=UTF-8' });
-        //   res.write('Method Not Allowed');
-        //   res.end();
-        //   break;
+          break;        
       }
     }
   });

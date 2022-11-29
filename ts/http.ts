@@ -3,22 +3,44 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-if (!fs.existsSync("../routes")) fs.mkdirSync("../routes",'1234', true); // 비 routes dir 존재 할 경우 생성 
+if (!fs.existsSync("../routes")) fs.mkdirSync("../routes", '1234', true); // 비 routes dir 존재 할 경우 생성
 // fs.mkdirSync("../routes", (err: any) => {
 //   if (err) throw err;
 //   DynamicMakeServer(header, main, footer);
 // });
 
+function fileString(dir: string, fileName: string) {
+  const readString = fs.readFileSync(`../${dir}/${fileName}`, 'utf-8', (err: any) => {
+    if (err) throw err;
+  });
+  // console.log(readString);
+  return readString;
+}
+
 //read
+
+const txtArr = new Array();
+fs.readdir('../bodyStructure', function (err: any, filelist: Array<string>) {
+  if (err) throw err;
+  // fs모듈의 readdir함수를 사용해
+  // 첫번째 인자로 파일 목록을 읽을 폴더(dir)를 가져오고
+  // 콜백함수의 두번째 인자로 폴더(dir)의 파일목록(filelist)을 가져옴
+
+  // console.log(Array.isArray( filelist));
+  // console.log(filelist);
+
+  for (let i = 0; i < filelist.length; i++) {
+    const textString = fileString("bodyStructure", filelist[i]);
+    // console.log(textString);
+    txtArr.push(textString);
+  }
+  
+  DynamicMakeServer(header, main, footer, txtArr);
+});
+
+
+
 const head = fs.readFileSync('../txt/head.txt', 'utf-8', (err: any) => {
-  if (err) throw err;
-});
-
-const header = fs.readFileSync('../txt/header.txt', 'utf-8', (err: any) => {
-  if (err) throw err;
-});
-
-const main = fs.readFileSync('../txt/body.txt', 'utf-8', (err: any) => {
   if (err) throw err;
 });
 
@@ -30,20 +52,27 @@ const readBody = () => {
   return bodyText;
 }
 
-const footer = fs.readFileSync('../txt/footer.txt', 'utf-8', (err: any) => {
+const header = fs.readFileSync('../bodyStructure/header.txt', 'utf-8', (err: any) => {
   if (err) throw err;
 });
 
-const DynamicMakeServer = (childItem1: string, childItem2: string, childItem3: string) => {
-  const bodyContext = `${childItem1} ${childItem2} ${childItem3}`;
+const main = fs.readFileSync('../bodyStructure/main.txt', 'utf-8', (err: any) => {
+  if (err) throw err;
+});
+
+const footer = fs.readFileSync('../bodyStructure/footer.txt', 'utf-8', (err: any) => {
+  if (err) throw err;
+});
+
+const DynamicMakeServer = (childItem1: string, childItem2: string, childItem3: string, stArr: Array<string>) => {
+  console.log(stArr);
+  const bodyContext = `${stArr[1]} ${stArr[2]} ${stArr[0]}`; // join으로 합치고 싵은데 순서가 맞지않아 일단 이렇게 처리
   const arr = ["a", "b", "c", "d"];
   for (let i = 0; i < arr.length; i++) {
     fs.writeFile(`../routes/${arr[i]}.txt`, arr[i], function (err: any) {
       if (err) throw err;
     });
   }
-
-
 
   // const returnBody = readBody();
 
@@ -54,7 +83,6 @@ const DynamicMakeServer = (childItem1: string, childItem2: string, childItem3: s
     //console.log(l_body);
     combine(header, l_body);
   });
-
 
   // const l_body:any = fs.readFileSync('../txt/body.txt', 'utf-8', (err: any) => {
   //       if (err) throw err;
@@ -115,6 +143,7 @@ const combine = (head: string, body: string) => {
   const b = `<html> <head>${head}</head> <body> ${routeB} </body></html>`;
   const c = `<html> <head>${head}</head> <body> ${routeC} </body></html>`;
   const d = `<html> <head>${head}</head> <body> ${routeD} </body></html>`;
+
   openServer(index, a, b, c, d);
 }
 
@@ -122,13 +151,13 @@ function openServer(index: string, a: string, b: string, c: string, d: string) {
   const server = http.createServer((req: any, res: any) => {
     let url = req.url;
     if (req.method === "GET") {
-      switch (url) {     
+      switch (url) {
         default:
           res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
           res.write(index);
           res.end();
           break;
-        
+
         case '/a':
           res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
           res.write(a);
@@ -148,14 +177,14 @@ function openServer(index: string, a: string, b: string, c: string, d: string) {
           res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
           res.write(d);
           res.end();
-          break;        
+          break;
       }
     }
   });
   server.listen(5678, (error: any) => { if (error) throw error; });
 }
 
-DynamicMakeServer(header, main, footer);
+
 
 
 // console.log(combine(,);

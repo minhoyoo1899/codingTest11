@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
+const abcArr = ["a", "b", "c", "d"];
+
 if (!fs.existsSync("../routes")) fs.mkdirSync("../routes", '1234', true); // 비 routes dir 존재 할 경우 생성
 // fs.mkdirSync("../routes", (err: any) => {
 //   if (err) throw err;
@@ -34,8 +36,8 @@ fs.readdir('../bodyStructure', function (err: any, filelist: Array<string>) {
     // console.log(textString);
     txtArr.push(textString);
   }
-  
-  DynamicMakeServer(header, main, footer, txtArr);
+
+  DynamicMakeServer(txtArr);
 });
 
 
@@ -52,24 +54,25 @@ const readBody = () => {
   return bodyText;
 }
 
-const header = fs.readFileSync('../bodyStructure/header.txt', 'utf-8', (err: any) => {
-  if (err) throw err;
-});
+// const header = fs.readFileSync('../bodyStructure/header.txt', 'utf-8', (err: any) => {
+//   if (err) throw err;
+// });
 
-const main = fs.readFileSync('../bodyStructure/main.txt', 'utf-8', (err: any) => {
-  if (err) throw err;
-});
+// const main = fs.readFileSync('../bodyStructure/main.txt', 'utf-8', (err: any) => {
+//   if (err) throw err;
+// });
 
-const footer = fs.readFileSync('../bodyStructure/footer.txt', 'utf-8', (err: any) => {
-  if (err) throw err;
-});
+// const footer = fs.readFileSync('../bodyStructure/footer.txt', 'utf-8', (err: any) => {
+//   if (err) throw err;
+// });
 
-const DynamicMakeServer = (childItem1: string, childItem2: string, childItem3: string, stArr: Array<string>) => {
-  console.log(stArr);
+
+const DynamicMakeServer = (stArr: Array<string>) => {
+  //console.log(stArr);
   const bodyContext = `${stArr[1]} ${stArr[2]} ${stArr[0]}`; // join으로 합치고 싵은데 순서가 맞지않아 일단 이렇게 처리
-  const arr = ["a", "b", "c", "d"];
-  for (let i = 0; i < arr.length; i++) {
-    fs.writeFile(`../routes/${arr[i]}.txt`, arr[i], function (err: any) {
+
+  for (let i = 0; i < abcArr.length; i++) {
+    fs.writeFile(`../routes/${abcArr[i]}.txt`, abcArr[i], function (err: any) {
       if (err) throw err;
     });
   }
@@ -81,7 +84,7 @@ const DynamicMakeServer = (childItem1: string, childItem2: string, childItem3: s
     const l_body = readBody();
     //console.log("a");
     //console.log(l_body);
-    combine(header, l_body);
+    combine(head, l_body);
   });
 
   // const l_body:any = fs.readFileSync('../txt/body.txt', 'utf-8', (err: any) => {
@@ -123,65 +126,155 @@ function htmlStructure(head: string, body: string) {
 }
 
 const combine = (head: string, body: string) => {
-  const routeA = fs.readFileSync('../routes/a.txt', 'utf-8', (err: any) => {
-    if (err) throw err;
-  });
-
-  const routeB = fs.readFileSync('../routes/b.txt', 'utf-8', (err: any) => {
-    if (err) throw err;
-  });
-
-  const routeC = fs.readFileSync('../routes/c.txt', 'utf-8', (err: any) => {
-    if (err) throw err;
-  });
-
-  const routeD = fs.readFileSync('../routes/d.txt', 'utf-8', (err: any) => {
-    if (err) throw err;
-  });
+  const routesArr: Array<string> = new Array();
+  // const routesObj: Object = new Object();
   const index = `<html> <head>${head}</head> <body> ${body} </body></html>`;
-  const a = `<html> <head>${head}</head> <body> ${routeA} </body></html>`;
-  const b = `<html> <head>${head}</head> <body> ${routeB} </body></html>`;
-  const c = `<html> <head>${head}</head> <body> ${routeC} </body></html>`;
-  const d = `<html> <head>${head}</head> <body> ${routeD} </body></html>`;
+  fs.readdir('../routes', function (err: any, filelist: Array<string>) {
+    if (err) throw err;     
+    for (let i = 0; i < filelist.length; i++) {
+      const textString = htmlStructure(head, fileString("routes", filelist[i]));
+      routesArr.push(textString);
+    }
+    openServer(index, routesArr);
+  });
+  // const routeA = fs.readFileSync('../routes/a.txt', 'utf-8', (err: any) => {
+  //   if (err) throw err;
+  // });
 
-  openServer(index, a, b, c, d);
+  // const routeB = fs.readFileSync('../routes/b.txt', 'utf-8', (err: any) => {
+  //   if (err) throw err;
+  // });
+
+  // const routeC = fs.readFileSync('../routes/c.txt', 'utf-8', (err: any) => {
+  //   if (err) throw err;
+  // });
+
+  // const routeD = fs.readFileSync('../routes/d.txt', 'utf-8', (err: any) => {
+  //   if (err) throw err;
+  // });
+
+
+  // const a = `<html> <head>${head}</head> <body> ${routeA} </body></html>`;
+  // const b = `<html> <head>${head}</head> <body> ${routeB} </body></html>`;
+  // const c = `<html> <head>${head}</head> <body> ${routeC} </body></html>`;
+  // const d = `<html> <head>${head}</head> <body> ${routeD} </body></html>`;
+
+
 }
 
-function openServer(index: string, a: string, b: string, c: string, d: string) {
+function openServer(index: string, routArr: Array<string>) {
+  console.log(routArr);
   const server = http.createServer((req: any, res: any) => {
     let url = req.url;
-    if (req.method === "GET") {
-      switch (url) {
-        default:
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-          res.write(index);
-          res.end();
-          break;
+    console.log(url);
+    console.log(typeof url);
+    console.log(url[1]);
+    // console.log(routArr.includes(url[1]));
+    // console.log(abcArr.find(v => v === url[1]));
+    const addr = abcArr.find(v => console.log(v), "a");
+    console.log(addr);
+    switch (req.method) {
+      case "GET":
+        if (url === "/") {
+            res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+            res.write(index);
+            res.end();
+        } else {
 
-        case '/a':
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-          res.write(a);
-          res.end();
-          break;
-        case '/b':
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-          res.write(b);
-          res.end();
-          break;
-        case '/c':
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-          res.write(c);
-          res.end();
-          break;
-        case '/d':
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-          res.write(d);
-          res.end();
-          break;
-      }
+        }
+        break;
+      case "POST":
+        console.log('post')
+        break;
+      case "PUT":
+        console.log("PUT");
+        break;
+      case "DELETE":
+        console.log("delete");
+        break;
+      case "PATCH":
+        console.log("PATCH");
+        break;
+      default:
+        console.log('hello error');
+        break;
     }
+
+    // if (req.method === "GET") {
+    //   rounting(res, index, routArr, url);
+    //   // for (let i = 0; i < routArr.length; i++) {
+    //   //   if (url === `/${abcArr[i]}`) {
+    //   //     rounting(res, routArr[i]);          
+    //   //   }
+    //   // }      
+
+
+
+    //   // switch (url) {
+    //   //   default:
+    //   //     rounting(res, index);
+    //   //     // res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+    //   //     // res.write(index);
+    //   //     // res.end();
+    //   //     break;
+    //   //   case `/${abcArr[0]}`:
+    //   //     rounting(res, routArr[0]);
+    //   //     break;
+
+
+
+    //   //   for (let i = 0; i < routArr.length; i++) {
+    //   //     case `/${abcArr[i]}`:
+    //   //     rounting(res, routArr[i]);
+    //   //     break;
+    //   //     }  
+
+    //   //   case '/a':
+    //   //     res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+    //   //     res.write(a);
+    //   //     res.end();
+    //   //     break;
+    //   //   case '/b':
+    //   //     res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+    //   //     res.write(b);
+    //   //     res.end();
+    //   //     break;
+    //   //   case '/c':
+    //   //     res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+    //   //     res.write(c);
+    //   //     res.end();
+    //   //     break;
+    //   //   case '/d':
+    //   //     res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+    //   //     res.write(d);
+    //   //     res.end();
+    //   //     break;
+    //   // }
+
+    // }
   });
   server.listen(5678, (error: any) => { if (error) throw error; });
+}
+
+
+
+function rounting(res: any, index: string, arr: Array<string>, url: any) {
+  switch (url) {
+    case "/":
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+
+      res.end();
+      break;
+  }
+  for (let i = 0; i < arr.length; i++) {
+    if (url === `/${abcArr[i]}`) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+      res.write(arr[i]);
+      res.end();
+    }
+
+  }
+
 }
 
 

@@ -2,8 +2,9 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
-const { parse } = require('querystring');
-console.log(parse);
+
+
+
 
 const abcArr = ["a", "b", "c", "d"];
 
@@ -194,19 +195,64 @@ function openServer(index: string, routArr: Array<string>) {
       case "POST":
         // console.log('POST');
         // console.log(res);
-        req.on('sendDat', (data) => { 
-          console.log(data);
-        });
-        // console.log(req);
-        // if (url === "/sendDat") {
-        //   console.log(req.parser);
-        //   // console.log(res);
-        //   res.writeHead(302, {
-        //     'Location': '/formDat'
-        //     //add other headers here...
-        //   });
-        //   res.end();
-        // }
+        // req.on('/sendDat', (data: any) => { 
+        //   console.log(data);
+        // });
+        //console.log(req);
+        if (url === "/sendDat") {
+          const reqArr: any = new Array();
+          req.on("data", (data: any) => { //"data" === 콜백함수 명령어
+            // console.log(decodeURI(data));
+            // console.log(typeof data);
+            // console.log(data);
+            const decordDat = decodeURI(data);
+            const spDat = decordDat.split("&");
+            const stringArr: any = new Array();
+            // console.log(spDat);
+            for (let i = 0; i < spDat.length; i++) {
+              const data = spDat[i].split("=");
+              // console.log(data);
+              stringArr.push(...data);          
+            }
+
+            for (let i = 0; i < stringArr.length; i++) {
+              if (i % 2 === 1) {
+                reqArr.push(stringArr[i]);
+              }
+            }
+            // console.log(reqArr);
+            
+            //배열을 하나로 합친다음 짝수번째 값만 출력하게 
+            
+            // console.log(decordDat);
+            // console.log(decordDat.split("&").split("="));
+            // for (let i = 0; spDat.length; i++) {
+            //   const splitData = spDat[i].split("=");
+            //   console.log(splitData);
+            // }
+            // console.log(typeof decordDat);
+            // const obj:any = new Object();            
+            // for (const [k, v] of decordDat) {
+            //   obj[k] = v;
+            // }
+            // console.log(obj);
+
+          })
+          req.on("end", () => {
+            const reqJoin = reqArr.join("<br/>");
+            const html = htmlStructure(head, reqJoin);
+            res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+            res.write(html);
+            res.end();
+          });
+          // console.log(req);          
+          // console.log(res);
+          // res.writeHead(302, {
+          //   'Location': '/formDat'
+          //   //add other headers here...
+          // });
+          // res.end();
+        }
         break;
       
       case "PUT":

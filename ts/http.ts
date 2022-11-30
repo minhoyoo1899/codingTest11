@@ -19,7 +19,6 @@ function fileString(dir: string, fileName: string) {
   return readString;
 }
 
-//read
 
 const txtArr = new Array();
 fs.readdir('../bodyStructure', function (err: any, filelist: Array<string>) {
@@ -45,6 +44,11 @@ fs.readdir('../bodyStructure', function (err: any, filelist: Array<string>) {
 const head = fs.readFileSync('../txt/head.txt', 'utf-8', (err: any) => {
   if (err) throw err;
 });
+
+const formTag = fs.readFileSync('../formTag/form.txt', 'utf-8', (err: any) => {
+  if (err) throw err;
+});
+console.log(formTag);
 
 const readBody = () => {
   const bodyText = fs.readFileSync('../txt/body.txt', 'utf-8', (err: any) => {
@@ -166,9 +170,9 @@ function openServer(index: string, routArr: Array<string>) {
   console.log(routArr);
   const server = http.createServer((req: any, res: any) => {
     let url = req.url;
-    console.log(url);
-    console.log(typeof url);
-    console.log(url[1]);
+    // console.log(url);
+    // console.log(typeof url);
+    // console.log(url[1]);
     // console.log(routArr.includes(url[1]));
     // console.log(abcArr.find(v => v === url[1]));
     const addr = abcArr.find(v => console.log(v), "a");

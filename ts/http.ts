@@ -180,7 +180,7 @@ function openServer(index: string, routArr: Array<string>) {
             res.write(index);
             res.end();
         } else {
-
+          rounting(res, routArr, url);
         }
         break;
       case "POST":
@@ -190,7 +190,7 @@ function openServer(index: string, routArr: Array<string>) {
         console.log("PUT");
         break;
       case "DELETE":
-        console.log("delete");
+        console.log("DELETE");
         break;
       case "PATCH":
         console.log("PATCH");
@@ -258,23 +258,35 @@ function openServer(index: string, routArr: Array<string>) {
 
 
 
-function rounting(res: any, index: string, arr: Array<string>, url: any) {
+function rounting(res: any, arr: Array<string>, url: any) {  
+  // console.log(res);
+  // console.log(arr);
+  // console.log(url);
   switch (url) {
-    case "/":
+    case "/a":
       res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-
+      res.write(arr[0]);
+      res.end();
+      break;
+    
+    case "/b":
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+      res.write(arr[1]);
+      res.end();
+      break;
+    
+    case "/c":
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+      res.write(arr[2]);
+      res.end();
+      break;
+    
+    case "/d":
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+      res.write(arr[3]);
       res.end();
       break;
   }
-  for (let i = 0; i < arr.length; i++) {
-    if (url === `/${abcArr[i]}`) {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-      res.write(arr[i]);
-      res.end();
-    }
-
-  }
-
 }
 
 

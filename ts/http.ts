@@ -2,6 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const { parse } = require('querystring');
+console.log(parse);
 
 const abcArr = ["a", "b", "c", "d"];
 
@@ -48,7 +50,7 @@ const head = fs.readFileSync('../txt/head.txt', 'utf-8', (err: any) => {
 const formTag = fs.readFileSync('../formTag/form.txt', 'utf-8', (err: any) => {
   if (err) throw err;
 });
-console.log(formTag);
+// console.log(formTag);
 
 const readBody = () => {
   const bodyText = fs.readFileSync('../txt/body.txt', 'utf-8', (err: any) => {
@@ -70,7 +72,6 @@ const readBody = () => {
 //   if (err) throw err;
 // });
 
-
 const DynamicMakeServer = (stArr: Array<string>) => {
   //console.log(stArr);
   const bodyContext = `${stArr[1]} ${stArr[2]} ${stArr[0]}`; // join으로 합치고 싵은데 순서가 맞지않아 일단 이렇게 처리
@@ -88,7 +89,7 @@ const DynamicMakeServer = (stArr: Array<string>) => {
     const l_body = readBody();
     //console.log("a");
     //console.log(l_body);
-    combine(head, l_body);
+    combine(head, l_body, formTag);
   });
 
   // const l_body:any = fs.readFileSync('../txt/body.txt', 'utf-8', (err: any) => {
@@ -129,7 +130,7 @@ function htmlStructure(head: string, body: string) {
   return `<html> <head>${head}</head> <body> ${body} </body></html>`;
 }
 
-const combine = (head: string, body: string) => {
+const combine = (head: string, body: string, formTag:string) => {
   const routesArr: Array<string> = new Array();
   // const routesObj: Object = new Object();
   const index = `<html> <head>${head}</head> <body> ${body} </body></html>`;
@@ -139,8 +140,12 @@ const combine = (head: string, body: string) => {
       const textString = htmlStructure(head, fileString("routes", filelist[i]));
       routesArr.push(textString);
     }
+    const formString = htmlStructure(head, formTag);
+    // console.log(formString);
+    routesArr.push(formString);
     openServer(index, routesArr);
   });
+
   // const routeA = fs.readFileSync('../routes/a.txt', 'utf-8', (err: any) => {
   //   if (err) throw err;
   // });
@@ -157,17 +162,14 @@ const combine = (head: string, body: string) => {
   //   if (err) throw err;
   // });
 
-
   // const a = `<html> <head>${head}</head> <body> ${routeA} </body></html>`;
   // const b = `<html> <head>${head}</head> <body> ${routeB} </body></html>`;
   // const c = `<html> <head>${head}</head> <body> ${routeC} </body></html>`;
   // const d = `<html> <head>${head}</head> <body> ${routeD} </body></html>`;
-
-
 }
 
 function openServer(index: string, routArr: Array<string>) {
-  console.log(routArr);
+  // console.log(routArr);
   const server = http.createServer((req: any, res: any) => {
     let url = req.url;
     // console.log(url);
@@ -175,9 +177,10 @@ function openServer(index: string, routArr: Array<string>) {
     // console.log(url[1]);
     // console.log(routArr.includes(url[1]));
     // console.log(abcArr.find(v => v === url[1]));
-    const addr = abcArr.find(v => console.log(v), "a");
-    console.log(addr);
+    // const addr = abcArr.find(v => console.log(v), "a"); console.log(addr);
+    
     switch (req.method) {
+
       case "GET":
         if (url === "/") {
             res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
@@ -187,20 +190,41 @@ function openServer(index: string, routArr: Array<string>) {
           rounting(res, routArr, url);
         }
         break;
+      
       case "POST":
-        console.log('post')
+        // console.log('POST');
+        // console.log(res);
+        req.on('sendDat', (data) => { 
+          console.log(data);
+        });
+        // console.log(req);
+        // if (url === "/sendDat") {
+        //   console.log(req.parser);
+        //   // console.log(res);
+        //   res.writeHead(302, {
+        //     'Location': '/formDat'
+        //     //add other headers here...
+        //   });
+        //   res.end();
+        // }
         break;
+      
       case "PUT":
-        console.log("PUT");
+        console.log("PUT");        
         break;
+      
       case "DELETE":
         console.log("DELETE");
         break;
+      
       case "PATCH":
         console.log("PATCH");
         break;
+      
       default:
-        console.log('hello error');
+        res.writeHead(405, { 'Content-Type': 'text/html' });
+        res.write('Method Not Allowed');
+        res.end();
         break;
     }
 
@@ -290,6 +314,13 @@ function rounting(res: any, arr: Array<string>, url: string) {
       res.write(arr[3]);
       res.end();
       break;
+    
+    case "/form":
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
+      res.write(arr[4]);
+      res.end();
+      break;
+    
   }
 }
 

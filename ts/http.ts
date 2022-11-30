@@ -258,7 +258,7 @@ function openServer(index: string, routArr: Array<string>) {
 
 
 
-function rounting(res: any, arr: Array<string>, url: any) {  
+function rounting(res: any, arr: Array<string>, url: string) {  
   // console.log(res);
   // console.log(arr);
   // console.log(url);

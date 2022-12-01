@@ -278,8 +278,7 @@ function openServer(index: string, routArr: Array<string>) {
             // console.log(newMap);
             for (const [k, v] of newMap) {
               jsonMap.set(k, v);
-            }
-            
+            }           
             
             // console.log(jsonMap);
           });

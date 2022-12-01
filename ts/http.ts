@@ -1,29 +1,30 @@
-// import http from "http";
-// import * as fs from "fs";
+ import http from "http";
+ import * as fs from "fs";
 import path from "path";
 import url from "url";
 
+// const http = require('http'); // import방식으로 에러처리가 안고쳐져서 일단 require방식으로 선언 후 사용 
+// const fs = require('fs');
 
-
-const http = require('http'); // import방식으로 에러처리가 안고쳐져서 일단 require방식으로 선언 후 사용 
-const fs = require('fs');
 // const path = require('path');
-// const url = require('url');
-
+//  const url = require('url');
 // const http:any = new http();
 
 const abcArr = ["a", "b", "c", "d"];
 
 if (!fs.existsSync("../routes")) fs.mkdirSync("../routes", '1234'); // 비 routes dir 존재 할 경우 생성
+if (fs.existsSync("../json")) fs.mkdirSync("../json", 'thisIsJson');
 // fs.mkdirSync("../routes", (err: any) => {
 //   if (err) throw err;
 //   DynamicMakeServer(header, main, footer);
 // });
 
 function fileString(dir: string, fileName: string) {
-  const readString = fs.readFileSync(`../${dir}/${fileName}`, 'utf-8', (err: any) => {
-    if (err) throw err;
-  });
+  const readString = fs.readFileSync(`../${dir}/${fileName}`, 'utf-8');
+  // const readString = fs.readFileSync(`../${dir}/${fileName}`, 'utf-8', (err: any, data:any) => {
+  //   if (err) throw err;
+  //   console.log(data);
+  // });
   // console.log(readString);
   return readString;
 }
@@ -49,19 +50,22 @@ fs.readdir('../bodyStructure', function (err: any, filelist: Array<string>) {
 
 
 
-const head = fs.readFileSync('../txt/head.txt', 'utf-8', (err: any) => {
-  if (err) throw err;
-});
+const head = fs.readFileSync('../txt/head.txt', 'utf-8');
+// const head = fs.readFileSync('../txt/head.txt', 'utf-8', (err: any) => {
+//   if (err) throw err;
+// });
 
-const formTag = fs.readFileSync('../formTag/form.txt', 'utf-8', (err: any) => {
-  if (err) throw err;
-});
+const formTag = fs.readFileSync('../formTag/form.txt', 'utf-8');
+// const formTag = fs.readFileSync('../formTag/form.txt', 'utf-8', (err: any) => {
+//   if (err) throw err;
+// });
 // console.log(formTag);
 
 const readBody = () => {
-  const bodyText = fs.readFileSync('../txt/body.txt', 'utf-8', (err: any) => {
-    if (err) throw err;
-  });
+  const bodyText = fs.readFileSync('../txt/body.txt', 'utf-8');
+  // const bodyText = fs.readFileSync('../txt/body.txt', 'utf-8', (err: any) => {
+  //   if (err) throw err;
+  // });
 
   return bodyText;
 }
@@ -262,6 +266,20 @@ function openServer(index: string, routArr: Array<string>) {
           //   //add other headers here...
           // });
           // res.end();
+        } else if (url === "/mkjson") {
+          const jsonMap = new Map();
+          req.on("data", (data: any) => {
+            const decordDat = decodeURI(data);
+            const newMap = new URLSearchParams(decordDat);
+            console.log(newMap);
+            for (const [k, v] of newMap) {
+              jsonMap.set(k, v);
+            }
+            console.log(jsonMap);
+          });
+          req.on("end", () => {
+            res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+          });
         }
         break;
       
@@ -337,7 +355,8 @@ function openServer(index: string, routArr: Array<string>) {
 
     // }
   });
-  server.listen(5678, (error: any) => { if (error) throw error; });
+  server.listen(5678);
+  // server.listen(5678, (error: any) => { if (error) throw error; });
 }
 
 

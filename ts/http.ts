@@ -1,5 +1,5 @@
- import http from "http";
- import * as fs from "fs";
+import http from "http";
+import * as fs from "fs";
 import path from "path";
 import url from "url";
 
@@ -13,7 +13,7 @@ import url from "url";
 const abcArr = ["a", "b", "c", "d"];
 
 if (!fs.existsSync("../routes")) fs.mkdirSync("../routes", '1234'); // 비 routes dir 존재 할 경우 생성
-if (fs.existsSync("../json")) fs.mkdirSync("../json", 'thisIsJson');
+if (!fs.existsSync("../json")) fs.mkdirSync("../json", '1234');
 // fs.mkdirSync("../routes", (err: any) => {
 //   if (err) throw err;
 //   DynamicMakeServer(header, main, footer);
@@ -60,6 +60,7 @@ const formTag = fs.readFileSync('../formTag/form.txt', 'utf-8');
 //   if (err) throw err;
 // });
 // console.log(formTag);
+const formJson = fs.readFileSync('../formTag/jsonform.txt', 'utf-8');
 
 const readBody = () => {
   const bodyText = fs.readFileSync('../txt/body.txt', 'utf-8');
@@ -99,7 +100,7 @@ const DynamicMakeServer = (stArr: Array<string>) => {
     const l_body = readBody();
     //console.log("a");
     //console.log(l_body);
-    combine(head, l_body, formTag);
+    combine(head, l_body, formTag, formJson);
   });
 
   // const l_body:any = fs.readFileSync('../txt/body.txt', 'utf-8', (err: any) => {
@@ -140,7 +141,7 @@ function htmlStructure(head: string, body: string) {
   return `<html> <head>${head}</head> <body> ${body} </body></html>`;
 }
 
-const combine = (head: string, body: string, formTag:string) => {
+const combine = (head: string, body: string, formTag:string, formJson: string) => {
   const routesArr: Array<string> = new Array();
   // const routesObj: Object = new Object();
   const index = `<html> <head>${head}</head> <body> ${body} </body></html>`;
@@ -153,6 +154,8 @@ const combine = (head: string, body: string, formTag:string) => {
     const formString = htmlStructure(head, formTag);
     // console.log(formString);
     routesArr.push(formString);
+    const jsonString = htmlStructure(head, formJson);
+    routesArr.push(jsonString);
     openServer(index, routesArr);
   });
 
@@ -271,14 +274,21 @@ function openServer(index: string, routArr: Array<string>) {
           req.on("data", (data: any) => {
             const decordDat = decodeURI(data);
             const newMap = new URLSearchParams(decordDat);
-            console.log(newMap);
+            
+            // console.log(newMap);
             for (const [k, v] of newMap) {
               jsonMap.set(k, v);
             }
-            console.log(jsonMap);
+            
+            
+            // console.log(jsonMap);
           });
           req.on("end", () => {
-            res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+            const mapString = JSON.stringify(Array.from(jsonMap.entries()));
+            fs.writeFileSync("../json/mkjson.json", mapString);
+            res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });            
+            res.write(mapString);
+            res.end();
           });
         }
         break;
@@ -398,7 +408,7 @@ function rounting(res: any, arr: Array<string>, url: string) {
     
     case "/json":
       res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
-      res.write(arr[4]);
+      res.write(arr[5]);
       res.end();
       break;
     

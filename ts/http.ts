@@ -278,14 +278,14 @@ function openServer(index: string, routArr: Array<string>) {
             // console.log(newMap);
             for (const [k, v] of newMap) {
               jsonMap.set(k, v);
-            }           
+            }
             
             // console.log(jsonMap);
           });
           req.on("end", () => {
             const mapString = JSON.stringify(Array.from(jsonMap.entries()));
             fs.writeFileSync("../json/mkjson.json", mapString);
-            res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });            
+            res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
             res.write(mapString);
             res.end();
           });
